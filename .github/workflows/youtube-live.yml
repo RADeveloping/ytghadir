@@ -1,0 +1,31 @@
+name: Extract YouTube Live M3U8
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Runs every 10 minutes
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  extract_live_stream:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yt-dlp
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip install yt-dlp
+
+      - name: Extract M3U8 URL
+        run: |
+          yt-dlp -g "https://www.youtube.com/@GhadirIslamicCentre/live" > livestream_url.txt
+          cat livestream_url.txt
+
+      - name: Upload Stream URL as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: livestream_url
+          path: livestream_url.txt
